@@ -1,0 +1,13 @@
+.git
+.github
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.DS_Store
+*.log
+.coverage
+.pytest_cache
+node_modules
+.vercel
