@@ -41,6 +41,14 @@ This project addresses Problem Statement AI-03: developing an AI system capable 
 └── validate_models.py     # Standalone offline model validation script
 ```
 
+## Limitations & Roadmap
+This system detects linguistic patterns associated with misinformation (sensationalism, urgency, unverified medical/policy claims) — it does not perform real-time fact verification. A calmly-worded false claim about a current event would not be reliably caught, since that requires cross-referencing live sources, not text classification. This is a known limitation of all text-classification-based fake news detectors, not specific to our model choice.
+
+**Next steps for a production version:**
+- Add a real-time corroboration layer (cross-check claims against live news search results)
+- Source/domain reputation scoring for shared links
+- Deploy as a public, mobile-responsive web app for verifying WhatsApp/social media forwards directly on a phone browser, no app install required
+
 ## 5. Setup & Run
 
 1. Clone the repository:

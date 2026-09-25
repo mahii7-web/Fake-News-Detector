@@ -258,6 +258,19 @@ body {
   font-size: 16px;
 }
 
+.offline-badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-variant: all-small-caps;
+  letter-spacing: 1.2px;
+  color: var(--ink-muted);
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+}
+
 /* Desk Action Buttons */
 .desk-actions {
   display: flex;
@@ -1151,5 +1164,59 @@ kbd {
     flex-direction: column;
     gap: 4px;
     text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 12px 6px;
+  }
+  .page-container {
+    padding: 0 10px;
+    border-left: none;
+    border-right: none;
+  }
+  .newspaper-title {
+    font-size: 40px;
+  }
+  .desk-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .desk-buttons-left {
+    width: 100%;
+    display: flex;
+    gap: 8px;
+  }
+  .primary-btn {
+    flex: 2;
+    justify-content: center;
+  }
+  .secondary-btn {
+    flex: 1;
+    justify-content: center;
+  }
+  .stamp-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  .rubber-stamp {
+    padding: 8px 18px;
+  }
+  .stamp-title {
+    font-size: 26px;
+  }
+  .meter-scale .tick-group span {
+    font-size: 8px;
+  }
+  .meter-legend {
+    flex-direction: column;
+    gap: 4px;
+  }
+  .tab-btn {
+    font-size: 9px;
+    padding: 6px 2px;
   }
 }
