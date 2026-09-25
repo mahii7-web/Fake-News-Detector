@@ -1,0 +1,12 @@
+# Tell Vercel not to treat this repo as a Python Serverless Function
+app.py
+requirements.txt
+render.yaml
+*.py
+.venv/
+__pycache__/
+smoke_test.py
+test_*.py
+validate_models.py
+demo_curated.json
+demo_samples.json
