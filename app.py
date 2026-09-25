@@ -2,6 +2,9 @@ import json
 import os
 import re
 import sys
+import urllib.parse
+import urllib.request
+import xml.etree.ElementTree as ET
 import torch
 from flask import Flask, request, jsonify, render_template
 
@@ -225,6 +228,131 @@ def classify():
             "confidence": 0.0,
             "flagged_phrases": [],
             "error": f"Inference failed safely: {str(e)}"
+        }), 200
+
+# ==============================================================================
+# OPTIONAL Real-Time Corroboration Layer (Non-blocking, Graceful Degradation)
+# ==============================================================================
+STOPWORDS = {
+    # English
+    "the", "a", "an", "in", "on", "at", "to", "for", "of", "with", "by", "from",
+    "is", "are", "was", "were", "be", "been", "being", "have", "has", "had",
+    "do", "does", "did", "will", "would", "shall", "should", "may", "might", "can", "could",
+    "and", "but", "or", "nor", "so", "yet", "both", "neither", "either",
+    "this", "that", "these", "those", "it", "its", "they", "them", "their",
+    "shocking", "urgent", "warning", "secret", "miracle", "alert", "breaking",
+    "completely", "without", "starting", "next", "after", "before", "about",
+    # Hindi
+    "का", "के", "की", "को", "में", "से", "पर", "है", "हैं", "था", "थी", "थे",
+    "और", "या", "यह", "वह", "इस", "उस", "ने", "भी", "तक", "लिए", "रहे", "रहा",
+    "सावधान", "तुरंत", "शेयर", "करें", "पूरी", "तरह", "सभी",
+    # Tamil
+    "இந்த", "அந்த", "ஒரு", "மற்றும்", "உடன்", "இல்", "க்கு", "இருந்து", "ஆகிய",
+    "அதிர்ச்சி", "தகவல்", "உடனே", "பகிருங்கள்", "அனைத்தும்"
+}
+
+def extract_search_terms(text: str) -> str:
+    cleaned = re.sub(r'[!?,.:;\'"()\[\]/\\॥|।]+', ' ', text)
+    tokens = cleaned.split()
+    meaningful = [w for w in tokens if w.lower() not in STOPWORDS and len(w) > 2]
+    if meaningful:
+        return " ".join(meaningful[:5])
+    return text[:60].strip()
+
+def search_news_corroboration(text: str, timeout: float = 3.5) -> dict:
+    query = extract_search_terms(text)
+    if not query:
+        return {"found": False, "query": "", "sources": [], "status": "No search terms extracted"}
+
+    # Detect language script for search localization
+    tamil_chars = sum(1 for c in text if '\u0B80' <= c <= '\u0BFF')
+    devanagari_chars = sum(1 for c in text if '\u0900' <= c <= '\u097F')
+    
+    hl, gl, ceid = "en-IN", "IN", "IN:en"
+    if tamil_chars > 3:
+        hl, gl, ceid = "ta", "IN", "IN:ta"
+    elif devanagari_chars > 3:
+        hl, gl, ceid = "hi", "IN", "IN:hi"
+
+    url = f"https://news.google.com/rss/search?q={urllib.parse.quote(query)}&hl={hl}&gl={gl}&ceid={ceid}"
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+    req = urllib.request.Request(url, headers=headers)
+
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            root = ET.fromstring(resp.read())
+            items = root.findall(".//item")
+            if not items:
+                return {
+                    "found": False,
+                    "query": query,
+                    "sources": [],
+                    "status": "No matching coverage found in live news"
+                }
+
+            sources = []
+            seen_sources = set()
+            for item in items:
+                source_name = item.find("source").text if item.find("source") is not None else ""
+                title = item.find("title").text if item.find("title") is not None else ""
+                link = item.find("link").text if item.find("link") is not None else ""
+                
+                clean_title = re.sub(r'\s*-\s*[^-\n]+$', '', title).strip()
+                source_label = source_name or "Verified News Outlet"
+
+                if source_label not in seen_sources:
+                    seen_sources.add(source_label)
+                    sources.append({
+                        "name": source_label,
+                        "title": clean_title,
+                        "link": link
+                    })
+                if len(sources) >= 2:
+                    break
+
+            return {
+                "found": len(sources) > 0,
+                "query": query,
+                "sources": sources,
+                "status": f"Matching coverage found across {len(sources)} source(s)" if sources else "No matching coverage found"
+            }
+    except Exception:
+        # Graceful degradation on timeout or offline mode
+        return {
+            "found": False,
+            "query": query,
+            "sources": [],
+            "status": "Corroboration check unavailable — offline mode."
+        }
+
+@app.route("/corroborate", methods=["POST"])
+def corroborate():
+    """
+    OPTIONAL real-time corroboration endpoint.
+    Accepts JSON {"text": "..."}.
+    Performs live news query with 3.5s timeout.
+    Degrades gracefully on timeout or offline mode.
+    """
+    try:
+        data = request.get_json(force=True, silent=True)
+        if not data or "text" not in data or not str(data["text"]).strip():
+            return jsonify({
+                "found": False,
+                "query": "",
+                "sources": [],
+                "status": "Missing or empty 'text' parameter."
+            }), 400
+
+        text = str(data["text"]).strip()
+        result = search_news_corroboration(text, timeout=3.5)
+        return jsonify(result), 200
+
+    except Exception as e:
+        return jsonify({
+            "found": False,
+            "query": "",
+            "sources": [],
+            "status": "Corroboration check unavailable — offline mode."
         }), 200
 
 if __name__ == "__main__":

@@ -210,6 +210,37 @@
               <ul id="flaggedList" class="flagged-notes-list">
                 <!-- Injected flagged clauses -->
               </ul>
+          </div>
+
+          <!-- Real-Time Corroboration Layer (Optional, Asynchronous, Second Signal) -->
+          <div class="corroboration-section">
+            <div class="corroboration-header">
+              <div class="corroboration-title-group">
+                <span class="bullet-square">■</span>
+                <h3>CORROBORATION CHECK (REQUIRES INTERNET)</h3>
+              </div>
+              <div class="corroboration-subnote">
+                Optional: requires internet for corroboration only
+              </div>
+            </div>
+
+            <div id="corroborationContent" class="corroboration-body">
+              <!-- Loading State -->
+              <div id="corroborationLoading" class="corroboration-loading">
+                <span class="corroboration-spinner">›</span>
+                <span class="corroboration-loading-text">QUERYING LIVE NEWS INDEX FOR MATCHING COVERAGE...</span>
+                <span class="blinking-caret">█</span>
+              </div>
+
+              <!-- Result State -->
+              <div id="corroborationResult" class="corroboration-result hidden">
+                <div class="corroboration-status-bar" id="corroborationStatus">
+                  <!-- Injected status -->
+                </div>
+                <div id="corroborationSourcesList" class="corroboration-sources-list">
+                  <!-- Injected sources -->
+                </div>
+              </div>
             </div>
           </div>
 

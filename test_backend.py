@@ -31,14 +31,18 @@ def run_tests():
     print(" Running Backend Integration Tests against Flask Test Client")
     print("=" * 65 + "\n")
 
-    # 1. Test /samples route
-    print("[TEST 1] Testing GET /samples endpoint...")
-    resp = client.get("/samples")
-    assert resp.status_code == 200, f"Expected 200, got {resp.status_code}"
-    samples_data = resp.get_json()
-    assert isinstance(samples_data, list), "Expected list of samples"
-    assert len(samples_data) == len(samples), f"Expected {len(samples)} samples, got {len(samples_data)}"
-    print(f"  --> PASS: GET /samples returned {len(samples_data)} samples with status 200.\n")
+    # 1. Test /samples route (curated default and full archive via ?all=true)
+    print("[TEST 1] Testing GET /samples (curated) and GET /samples?all=true endpoints...")
+    resp_curated = client.get("/samples")
+    assert resp_curated.status_code == 200, f"Expected 200, got {resp_curated.status_code}"
+    curated_data = resp_curated.get_json()
+    assert isinstance(curated_data, list) and len(curated_data) == 5, f"Expected 5 curated samples, got {len(curated_data)}"
+
+    resp_all = client.get("/samples?all=true")
+    assert resp_all.status_code == 200, f"Expected 200, got {resp_all.status_code}"
+    all_data = resp_all.get_json()
+    assert isinstance(all_data, list) and len(all_data) == len(samples), f"Expected {len(samples)} samples, got {len(all_data)}"
+    print(f"  --> PASS: /samples returned {len(curated_data)} curated samples and ?all=true returned {len(all_data)} samples.\n")
 
     # 2. Test /classify route with all 15 samples
     print(f"[TEST 2] Testing POST /classify endpoint with all {len(samples)} samples...")

@@ -28,6 +28,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const redactedDocument = document.getElementById("redactedDocument");
   const flaggedList = document.getElementById("flaggedList");
 
+  // Corroboration Elements
+  const corroborationLoading = document.getElementById("corroborationLoading");
+  const corroborationResult = document.getElementById("corroborationResult");
+  const corroborationStatus = document.getElementById("corroborationStatus");
+  const corroborationSourcesList = document.getElementById("corroborationSourcesList");
+
   // Archive & Tabs
   const samplesContainer = document.getElementById("samplesContainer");
   const langTabs = document.getElementById("langTabs");
@@ -238,6 +244,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // Reveal Results
     resultsSection.classList.remove("hidden");
     resultsSection.scrollIntoView({ behavior: "smooth", block: "nearest" });
+
+    // Asynchronously trigger corroboration check (non-blocking)
+    fetchCorroboration(originalText);
   }
 
   // 7. Forensic Text Inspection: Solid Black Redaction Bars
@@ -300,6 +309,54 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
       flaggedList.appendChild(li);
     });
+  }
+
+  // 9. Real-Time Corroboration Layer (Optional, Non-blocking, Graceful Degradation)
+  async function fetchCorroboration(text) {
+    if (!corroborationLoading || !corroborationResult) return;
+
+    corroborationLoading.classList.remove("hidden");
+    corroborationResult.classList.add("hidden");
+    corroborationSourcesList.innerHTML = "";
+
+    try {
+      const response = await fetch("/corroborate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: text })
+      });
+
+      const data = await response.json();
+
+      if (data && data.found && data.sources && data.sources.length > 0) {
+        corroborationStatus.className = "corroboration-status-bar found";
+        corroborationStatus.textContent = `✓ MATCHING COVERAGE FOUND IN LIVE NEWS ARCHIVES (${data.sources.length} SOURCES)`;
+
+        corroborationSourcesList.innerHTML = "";
+        data.sources.forEach(src => {
+          const div = document.createElement("div");
+          div.className = "corroboration-source-card";
+          div.innerHTML = `
+            <span class="source-name-badge">${escapeHtml(src.name)}</span>
+            <span class="source-title-text">${escapeHtml(src.title)}</span>
+            <a href="${escapeHtml(src.link)}" target="_blank" rel="noopener noreferrer" class="source-link-anchor">VIEW SOURCE ↗</a>
+          `;
+          corroborationSourcesList.appendChild(div);
+        });
+      } else if (data && data.status && data.status.toLowerCase().includes("offline")) {
+        corroborationStatus.className = "corroboration-status-bar offline";
+        corroborationStatus.textContent = "⚡ Corroboration check unavailable — offline mode.";
+      } else {
+        corroborationStatus.className = "corroboration-status-bar not-found";
+        corroborationStatus.textContent = "○ No matching coverage found in live news archives for these terms.";
+      }
+    } catch (err) {
+      corroborationStatus.className = "corroboration-status-bar offline";
+      corroborationStatus.textContent = "⚡ Corroboration check unavailable — offline mode.";
+    } finally {
+      corroborationLoading.classList.add("hidden");
+      corroborationResult.classList.remove("hidden");
+    }
   }
 
   // Utilities
