@@ -27,6 +27,16 @@ print(f"[Model 2/2] Loading multilingual zero-shot classifier: {NLI_MODEL_NAME}.
 classifier_pipe = pipeline("zero-shot-classification", model=NLI_MODEL_NAME, device=device)
 print("[Model 2/2] Multilingual classifier loaded successfully.")
 
+# Warm-up pass to eliminate cold-start inference lag during live evaluation
+print("[Warm-up] Executing startup warm-up inference pass...")
+try:
+    _dummy_text = "Headline test: Breaking scientific discovery."
+    _ = lang_pipe(_dummy_text[:512])
+    _ = classifier_pipe(_dummy_text[:512], candidate_labels=["reliable news", "misleading/fake news"])
+    print("Models warmed up and ready")
+except Exception as _we:
+    print(f"[Warm-up Note]: {_we}")
+
 # Human-readable language map
 LANG_MAP = {
     "en": "English",
@@ -144,8 +154,15 @@ def index():
 
 @app.route("/samples", methods=["GET"])
 def get_samples():
-    """Returns the contents of demo_samples.json for one-click demo buttons."""
-    samples_path = os.path.join(os.path.dirname(__file__), "demo_samples.json")
+    """
+    Returns curated demo samples by default (demo_curated.json).
+    Returns the full 15 samples if query parameter ?all=true is passed.
+    """
+    show_all = request.args.get("all", "false").lower() in ["true", "1", "yes"]
+    filename = "demo_samples.json" if show_all else "demo_curated.json"
+    samples_path = os.path.join(os.path.dirname(__file__), filename)
+    if not os.path.exists(samples_path):
+        samples_path = os.path.join(os.path.dirname(__file__), "demo_samples.json")
     try:
         with open(samples_path, "r", encoding="utf-8") as f:
             samples = json.load(f)

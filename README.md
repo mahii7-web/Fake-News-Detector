@@ -28,7 +28,8 @@ This project addresses Problem Statement AI-03: developing an AI system capable 
 .
 ├── .gitignore             # Git ignore rules for virtual environments and model caches
 ├── app.py                 # Single-file Flask server, model initialization, and API routes
-├── demo_samples.json      # 15 curated real/fake news headlines across English, Hindi, and Tamil
+├── demo_curated.json      # Official high-confidence verified demo samples for hackathon evaluation
+├── demo_samples.json      # 15 reference real/fake news headlines across English, Hindi, and Tamil
 ├── README.md              # Project documentation and evaluation overview
 ├── requirements.txt       # Python project dependencies
 ├── static/

@@ -31,6 +31,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Archive & Tabs
   const samplesContainer = document.getElementById("samplesContainer");
   const langTabs = document.getElementById("langTabs");
+  const showAllToggle = document.getElementById("showAllToggle");
+  const modeBadge = document.getElementById("modeBadge");
 
   let allSamples = [];
   let currentFilter = "all";
@@ -62,16 +64,48 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // 4. Fetch & Render Wire Archive Samples
-  async function loadSamples() {
+  async function loadSamples(loadAll = false) {
     try {
-      const res = await fetch("/samples");
+      const url = loadAll ? "/samples?all=true" : "/samples";
+      const res = await fetch(url);
       if (!res.ok) throw new Error("Failed to load wire samples");
       allSamples = await res.json();
+      
+      // Update tab counts
+      updateTabLabels();
       renderSampleCards();
+
+      if (modeBadge) {
+        modeBadge.textContent = loadAll ? "FULL 15-ITEM ARCHIVE" : "★ CURATED DEMO SET";
+      }
     } catch (err) {
       console.warn("Could not load samples:", err);
       samplesContainer.innerHTML = `<div class="sample-error-note">Archive offline. You can still paste dispatches manually.</div>`;
     }
+  }
+
+  function updateTabLabels() {
+    const totalCount = allSamples.length;
+    const enCount = allSamples.filter(s => s.lang_code === "en").length;
+    const hiCount = allSamples.filter(s => s.lang_code === "hi").length;
+    const taCount = allSamples.filter(s => s.lang_code === "ta").length;
+
+    const allBtn = langTabs.querySelector('[data-filter="all"]');
+    const enBtn = langTabs.querySelector('[data-filter="en"]');
+    const hiBtn = langTabs.querySelector('[data-filter="hi"]');
+    const taBtn = langTabs.querySelector('[data-filter="ta"]');
+
+    if (allBtn) allBtn.textContent = `ALL (${totalCount})`;
+    if (enBtn) enBtn.textContent = `ENGLISH (${enCount})`;
+    if (hiBtn) hiBtn.textContent = `HINDI (${hiCount})`;
+    if (taBtn) taBtn.textContent = `TAMIL (${taCount})`;
+  }
+
+  // Toggle handler for curated vs all
+  if (showAllToggle) {
+    showAllToggle.addEventListener("change", () => {
+      loadSamples(showAllToggle.checked);
+    });
   }
 
   function renderSampleCards() {

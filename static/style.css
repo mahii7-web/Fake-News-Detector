@@ -883,6 +883,48 @@ kbd {
   margin-top: 4px;
 }
 
+.archive-mode-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--rule-line-subtle);
+}
+
+.toggle-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle-control input[type="checkbox"] {
+  accent-color: var(--ink-primary);
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+}
+
+.toggle-text {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--ink-secondary);
+}
+
+.mode-badge {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 2px 6px;
+  background-color: var(--ink-primary);
+  color: var(--bg-newsprint);
+}
+
 /* Filter Tabs */
 .archive-tabs {
   display: grid;
