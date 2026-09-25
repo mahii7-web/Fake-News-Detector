@@ -50,14 +50,23 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentFilter = "all";
   let dispatchCounter = 1042;
 
-  // Backend API URL: uses relative path when hosted directly on Flask port 5000,
-  // and automatically routes to the live public tunnel when deployed on Vercel or any other host.
-  const isLocalFlask = (window.location.port === "5000");
+  // Backend API URL:
+  // - Direct Flask port 5000: relative ""
+  // - Local static server (localhost:3000): "http://127.0.0.1:5000"
+  // - Production Vercel: "https://clear-rockets-punch.loca.lt"
+  const isLocalHost = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+  const isPort5000 = (window.location.port === "5000");
+
+  let defaultApiUrl = "https://clear-rockets-punch.loca.lt";
+  if (isPort5000) {
+    defaultApiUrl = "";
+  } else if (isLocalHost) {
+    defaultApiUrl = "http://127.0.0.1:5000";
+  }
+
   const API_BASE_URL = window.API_BASE_URL ||
     localStorage.getItem("varavaakku_api_url") ||
-    (isLocalFlask
-      ? ""
-      : "https://clear-rockets-punch.loca.lt");
+    defaultApiUrl;
 
   // 1. Textarea Input Buffer Counter
   function updateBufferStatus() {
@@ -89,11 +98,27 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const endpoint = loadAll ? "/samples?all=true" : "/samples";
       const url = `${API_BASE_URL}${endpoint}`;
-      const res = await fetch(url, {
-        headers: { "Bypass-Tunnel-Reminder": "true" }
-      });
-      if (!res.ok) throw new Error("Failed to load wire samples");
-      allSamples = await res.json();
+      
+      let loadedSuccessfully = false;
+      try {
+        const res = await fetch(url, {
+          headers: { "Bypass-Tunnel-Reminder": "true" }
+        });
+        if (res.ok) {
+          allSamples = await res.json();
+          loadedSuccessfully = true;
+        }
+      } catch (networkErr) {
+        console.warn("Backend /samples unreachable, using local static fallback:", networkErr);
+      }
+
+      // If backend failed or was unreachable, load static JSON fallback
+      if (!loadedSuccessfully) {
+        const fallbackFile = loadAll ? "demo_samples.json" : "demo_curated.json";
+        const fallbackRes = await fetch(fallbackFile);
+        if (!fallbackRes.ok) throw new Error("Could not load wire archive.");
+        allSamples = await fallbackRes.json();
+      }
       
       // Update tab counts
       updateTabLabels();

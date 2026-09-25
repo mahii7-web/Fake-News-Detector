@@ -1,0 +1,9 @@
+{
+  "name": "varavaakku-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "VaraVaakku Newsroom Verification Desk Frontend",
+  "scripts": {
+    "build": "echo 'Static build complete'"
+  }
+}

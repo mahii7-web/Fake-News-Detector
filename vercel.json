@@ -1,10 +1,15 @@
 {
   "version": 2,
+  "framework": null,
+  "buildCommand": null,
+  "outputDirectory": "frontend",
   "cleanUrls": true,
   "rewrites": [
     { "source": "/", "destination": "/frontend/index.html" },
     { "source": "/style.css", "destination": "/frontend/style.css" },
     { "source": "/app.js", "destination": "/frontend/app.js" },
+    { "source": "/demo_curated.json", "destination": "/frontend/demo_curated.json" },
+    { "source": "/demo_samples.json", "destination": "/frontend/demo_samples.json" },
     { "source": "/(.*)", "destination": "/frontend/$1" }
   ],
   "headers": [
