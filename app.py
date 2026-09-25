@@ -325,12 +325,90 @@ def search_news_corroboration(text: str, timeout: float = 3.5) -> dict:
             "status": "Corroboration check unavailable — offline mode."
         }
 
+def reconcile_verdict(offline_verdict: str, offline_confidence: float, search_result: dict) -> dict:
+    """
+    Reconciles offline zero-shot classification with real-time news corroboration.
+    
+    1. If corroboration finds matching coverage from 2+ sources:
+       - Override displayed verdict to 'RELIABLE — CORROBORATED' regardless of offline output,
+         UNLESS offline confidence for 'Misleading' was very high (90%+), in which case show:
+         'Content pattern flagged, but matching coverage found — recommend manual review'
+       - Visually change stamp badge to 'CORROBORATED' (neutral/blue) or 'MANUAL REVIEW' (amber).
+    2. If corroboration finds NO matching coverage:
+       - Keep offline verdict as-is, with caveat:
+         'No corroborating source found — verdict based on content pattern only'
+    3. If corroboration is unavailable (offline mode / timeout):
+       - Keep offline verdict with fallback message:
+         'Corroboration check unavailable — offline mode.'
+    """
+    sources = search_result.get("sources", [])
+    found = search_result.get("found", False)
+    status = search_result.get("status", "")
+    is_offline = "offline mode" in status.lower()
+
+    is_reliable_offline = "reliable" in (offline_verdict or "").lower()
+    default_stamp_state = "verified" if is_reliable_offline else "flagged"
+    default_stamp_title = "VERIFIED" if is_reliable_offline else "FLAGGED"
+    default_stamp_subtitle = "RELIABLE NEWS" if is_reliable_offline else "MISLEADING / FAKE"
+    default_stamp_code = "DESK APPROVAL · PASS" if is_reliable_offline else "ANOMALY REJECT · HOAX"
+
+    if is_offline or not search_result.get("query"):
+        return {
+            "final_verdict": offline_verdict or "Unverified",
+            "stamp_state": default_stamp_state,
+            "stamp_title": default_stamp_title,
+            "stamp_subtitle": default_stamp_subtitle,
+            "stamp_code": default_stamp_code,
+            "reconciliation_action": "offline_fallback",
+            "reconciliation_note": "Corroboration check unavailable — offline mode.",
+            "is_corroborated": False
+        }
+
+    # 1. Matching coverage found across 2+ sources
+    if found and len(sources) >= 2:
+        is_misleading = "misleading" in (offline_verdict or "").lower()
+        if is_misleading and offline_confidence >= 90.0:
+            return {
+                "final_verdict": "Manual Review Recommended",
+                "stamp_state": "review",
+                "stamp_title": "MANUAL REVIEW",
+                "stamp_subtitle": "FLAGGED PATTERN · WIRE MATCH",
+                "stamp_code": "DUAL SIGNAL · MANUAL AUDIT REQUIRED",
+                "reconciliation_action": "manual_review",
+                "reconciliation_note": "Content pattern flagged, but matching coverage found — recommend manual review",
+                "is_corroborated": True
+            }
+        else:
+            return {
+                "final_verdict": "RELIABLE — CORROBORATED",
+                "stamp_state": "corroborated",
+                "stamp_title": "CORROBORATED",
+                "stamp_subtitle": "RELIABLE — CORROBORATED",
+                "stamp_code": f"LIVE WIRE MATCH · {len(sources)} SOURCES",
+                "reconciliation_action": "override_reliable",
+                "reconciliation_note": f"Matching coverage found across {len(sources)} source(s) — external news confirmation",
+                "is_corroborated": True
+            }
+
+    # 2. No matching coverage found
+    return {
+        "final_verdict": offline_verdict or "Unverified",
+        "stamp_state": default_stamp_state,
+        "stamp_title": default_stamp_title,
+        "stamp_subtitle": default_stamp_subtitle,
+        "stamp_code": default_stamp_code,
+        "reconciliation_action": "keep_offline",
+        "reconciliation_note": "No corroborating source found — verdict based on content pattern only",
+        "is_corroborated": False
+    }
+
 @app.route("/corroborate", methods=["POST"])
 def corroborate():
     """
     OPTIONAL real-time corroboration endpoint.
-    Accepts JSON {"text": "..."}.
+    Accepts JSON {"text": "...", "offline_verdict": "...", "offline_confidence": ...}.
     Performs live news query with 3.5s timeout.
+    Reconciles with offline signals into a single coherent result.
     Degrades gracefully on timeout or offline mode.
     """
     try:
@@ -344,16 +422,30 @@ def corroborate():
             }), 400
 
         text = str(data["text"]).strip()
+        offline_verdict = data.get("offline_verdict")
+        offline_confidence = float(data.get("offline_confidence", 0.0))
+
         result = search_news_corroboration(text, timeout=3.5)
+
+        if offline_verdict:
+            result["reconciliation"] = reconcile_verdict(offline_verdict, offline_confidence, result)
+
         return jsonify(result), 200
 
     except Exception as e:
-        return jsonify({
+        fallback_result = {
             "found": False,
             "query": "",
             "sources": [],
             "status": "Corroboration check unavailable — offline mode."
-        }), 200
+        }
+        if data and data.get("offline_verdict"):
+            fallback_result["reconciliation"] = reconcile_verdict(
+                data.get("offline_verdict"),
+                float(data.get("offline_confidence", 0.0)),
+                fallback_result
+            )
+        return jsonify(fallback_result), 200
 
 if __name__ == "__main__":
     print("\nStarting Flask web server on http://127.0.0.1:5000 ...")

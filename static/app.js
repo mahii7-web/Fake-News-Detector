@@ -28,6 +28,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const redactedDocument = document.getElementById("redactedDocument");
   const flaggedList = document.getElementById("flaggedList");
 
+  // Reconciled Verdict & Evidence Dossier Elements
+  const finalVerdictHeadline = document.getElementById("finalVerdictHeadline");
+  const reconciliationCaveatBadge = document.getElementById("reconciliationCaveatBadge");
+  const signalOfflineBadge = document.getElementById("signalOfflineBadge");
+  const signalCorroborationBadge = document.getElementById("signalCorroborationBadge");
+
   // Corroboration Elements
   const corroborationLoading = document.getElementById("corroborationLoading");
   const corroborationResult = document.getElementById("corroborationResult");
@@ -201,6 +207,33 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // Helper: Set Rubber Stamp Visual State
+  function setStampState(state, verdictText, conf, customCode) {
+    verdictStamp.className = "rubber-stamp";
+    
+    if (state === "corroborated") {
+      verdictStamp.classList.add("stamp-corroborated");
+      stampTitle.textContent = "CORROBORATED";
+      stampVerdictText.textContent = "RELIABLE — CORROBORATED";
+      stampCode.textContent = customCode || "LIVE WIRE MATCH · 2+ SOURCES";
+    } else if (state === "review") {
+      verdictStamp.classList.add("stamp-review");
+      stampTitle.textContent = "MANUAL REVIEW";
+      stampVerdictText.textContent = "FLAGGED PATTERN · WIRE MATCH";
+      stampCode.textContent = customCode || "DUAL SIGNAL · MANUAL AUDIT REQUIRED";
+    } else if (state === "verified") {
+      verdictStamp.classList.add("stamp-verified");
+      stampTitle.textContent = "VERIFIED";
+      stampVerdictText.textContent = "RELIABLE NEWS";
+      stampCode.textContent = customCode || "DESK APPROVAL · PASS";
+    } else {
+      verdictStamp.classList.add("stamp-flagged");
+      stampTitle.textContent = "FLAGGED";
+      stampVerdictText.textContent = "MISLEADING / FAKE";
+      stampCode.textContent = customCode || "ANOMALY REJECT · HOAX";
+    }
+  }
+
   // 6. Display Results Dossier
   function displayResults(data, originalText) {
     dispatchCounter++;
@@ -209,24 +242,34 @@ document.addEventListener("DOMContentLoaded", () => {
     // Detected Language
     detectedLanguage.textContent = data.language || "Unknown";
 
-    // Verdict Stamp
     const isReliable = data.verdict && data.verdict.toLowerCase().includes("reliable");
-    verdictStamp.className = "rubber-stamp";
-    
-    if (isReliable) {
-      verdictStamp.classList.add("stamp-verified");
-      stampTitle.textContent = "VERIFIED";
-      stampVerdictText.textContent = "RELIABLE NEWS";
-      stampCode.textContent = "DESK APPROVAL · PASS";
-    } else {
-      verdictStamp.classList.add("stamp-flagged");
-      stampTitle.textContent = "FLAGGED";
-      stampVerdictText.textContent = "MISLEADING / FAKE";
-      stampCode.textContent = "ANOMALY REJECT · HOAX";
+    const conf = Math.max(0, Math.min(100, parseFloat(data.confidence) || 0));
+
+    // Initial Rubber Stamp (from offline classification)
+    setStampState(isReliable ? "verified" : "flagged", data.verdict, conf);
+
+    // Initial Top Final Combined Verdict
+    if (finalVerdictHeadline) {
+      finalVerdictHeadline.textContent = data.verdict ? data.verdict.toUpperCase() : "ANALYZED";
+    }
+    if (reconciliationCaveatBadge) {
+      reconciliationCaveatBadge.className = "reconciliation-caveat-badge";
+      reconciliationCaveatBadge.textContent = "⚡ Running 100% offline — querying live press wire for corroboration...";
+    }
+
+    // Signal 1 Card Badge
+    if (signalOfflineBadge) {
+      signalOfflineBadge.className = `evidence-badge ${isReliable ? 'badge-reliable' : 'badge-misleading'}`;
+      signalOfflineBadge.textContent = `Offline: ${data.verdict} (${conf.toFixed(1)}%)`;
+    }
+
+    // Signal 2 Card Badge (Initial)
+    if (signalCorroborationBadge) {
+      signalCorroborationBadge.className = "evidence-badge";
+      signalCorroborationBadge.textContent = "Live Wire: Querying...";
     }
 
     // Polygraph Confidence Scale
-    const conf = Math.max(0, Math.min(100, parseFloat(data.confidence) || 0));
     confidenceValue.textContent = `${conf.toFixed(1)}%`;
     needleTag.textContent = `${conf.toFixed(1)}%`;
     
@@ -245,8 +288,8 @@ document.addEventListener("DOMContentLoaded", () => {
     resultsSection.classList.remove("hidden");
     resultsSection.scrollIntoView({ behavior: "smooth", block: "nearest" });
 
-    // Asynchronously trigger corroboration check (non-blocking)
-    fetchCorroboration(originalText);
+    // Asynchronously trigger corroboration check (non-blocking, passing offline signals)
+    fetchCorroboration(originalText, data);
   }
 
   // 7. Forensic Text Inspection: Solid Black Redaction Bars
@@ -311,29 +354,41 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 9. Real-Time Corroboration Layer (Optional, Non-blocking, Graceful Degradation)
-  async function fetchCorroboration(text) {
+  // 9. Real-Time Corroboration Layer with Verdict Reconciliation
+  async function fetchCorroboration(text, offlineData) {
     if (!corroborationLoading || !corroborationResult) return;
 
     corroborationLoading.classList.remove("hidden");
     corroborationResult.classList.add("hidden");
     corroborationSourcesList.innerHTML = "";
 
+    const offlineVerdict = offlineData ? offlineData.verdict : "";
+    const offlineConfidence = offlineData ? (parseFloat(offlineData.confidence) || 0) : 0;
+    const isOfflineMisleading = (offlineVerdict || "").toLowerCase().includes("misleading");
+
     try {
       const response = await fetch("/corroborate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: text })
+        body: JSON.stringify({
+          text: text,
+          offline_verdict: offlineVerdict,
+          offline_confidence: offlineConfidence
+        })
       });
 
       const data = await response.json();
+      const sources = (data && data.sources) ? data.sources : [];
+      const found = !!(data && data.found && sources.length > 0);
+      const isOfflineStatus = !!(data && data.status && data.status.toLowerCase().includes("offline"));
 
-      if (data && data.found && data.sources && data.sources.length > 0) {
+      // 1. Render Signal 2 (Corroboration Card Content)
+      if (found) {
         corroborationStatus.className = "corroboration-status-bar found";
-        corroborationStatus.textContent = `✓ MATCHING COVERAGE FOUND IN LIVE NEWS ARCHIVES (${data.sources.length} SOURCES)`;
+        corroborationStatus.textContent = `✓ MATCHING COVERAGE FOUND IN LIVE NEWS ARCHIVES (${sources.length} SOURCES)`;
 
         corroborationSourcesList.innerHTML = "";
-        data.sources.forEach(src => {
+        sources.forEach(src => {
           const div = document.createElement("div");
           div.className = "corroboration-source-card";
           div.innerHTML = `
@@ -343,16 +398,97 @@ document.addEventListener("DOMContentLoaded", () => {
           `;
           corroborationSourcesList.appendChild(div);
         });
-      } else if (data && data.status && data.status.toLowerCase().includes("offline")) {
+      } else if (isOfflineStatus) {
         corroborationStatus.className = "corroboration-status-bar offline";
         corroborationStatus.textContent = "⚡ Corroboration check unavailable — offline mode.";
       } else {
         corroborationStatus.className = "corroboration-status-bar not-found";
         corroborationStatus.textContent = "○ No matching coverage found in live news archives for these terms.";
       }
+
+      // 2. Verdict Reconciliation: Roll up into ONE coherent final verdict at top
+      if (found && sources.length >= 2) {
+        // Case 1: Corroboration finds matching coverage from 2+ sources
+        if (isOfflineMisleading && offlineConfidence >= 90.0) {
+          // Exception: Offline confidence for "Misleading" was very high (90%+)
+          setStampState("review", "FLAGGED PATTERN · WIRE MATCH", offlineConfidence, "DUAL SIGNAL · MANUAL AUDIT REQUIRED");
+          if (finalVerdictHeadline) finalVerdictHeadline.textContent = "MANUAL REVIEW RECOMMENDED";
+          if (reconciliationCaveatBadge) {
+            reconciliationCaveatBadge.className = "reconciliation-caveat-badge review";
+            reconciliationCaveatBadge.textContent = "⚠ Content pattern flagged, but matching coverage found — recommend manual review";
+          }
+          if (signalOfflineBadge) {
+            signalOfflineBadge.className = "evidence-badge badge-review";
+            signalOfflineBadge.textContent = `Offline: Pattern Flagged (${offlineConfidence.toFixed(1)}%)`;
+          }
+          if (signalCorroborationBadge) {
+            signalCorroborationBadge.className = "evidence-badge badge-corroborated";
+            signalCorroborationBadge.textContent = `Live: ${sources.length} Sources Found`;
+          }
+        } else {
+          // Override to "RELIABLE — CORROBORATED"
+          setStampState("corroborated", "RELIABLE — CORROBORATED", offlineConfidence, `LIVE WIRE MATCH · ${sources.length} SOURCES`);
+          if (finalVerdictHeadline) finalVerdictHeadline.textContent = "RELIABLE — CORROBORATED";
+          if (reconciliationCaveatBadge) {
+            reconciliationCaveatBadge.className = "reconciliation-caveat-badge reconciled";
+            if (isOfflineMisleading) {
+              reconciliationCaveatBadge.textContent = `✓ Reconciled: External news coverage verified across ${sources.length} sources (overrode offline pattern flag)`;
+            } else {
+              reconciliationCaveatBadge.textContent = `✓ Corroborated: Real-time news coverage confirmed across ${sources.length} verified sources`;
+            }
+          }
+          if (signalOfflineBadge) {
+            signalOfflineBadge.className = `evidence-badge ${isOfflineMisleading ? 'badge-misleading' : 'badge-reliable'}`;
+            signalOfflineBadge.textContent = isOfflineMisleading 
+              ? `Offline: Flagged (${offlineConfidence.toFixed(1)}%) [OVERRIDDEN]`
+              : `Offline: Reliable (${offlineConfidence.toFixed(1)}%)`;
+          }
+          if (signalCorroborationBadge) {
+            signalCorroborationBadge.className = "evidence-badge badge-corroborated";
+            signalCorroborationBadge.textContent = `Live: ${sources.length} Sources Confirmed`;
+          }
+        }
+      } else if (!found || sources.length < 2) {
+        // Case 2: No matching coverage found
+        const isReliable = !isOfflineMisleading;
+        setStampState(isReliable ? "verified" : "flagged", offlineVerdict, offlineConfidence);
+        if (finalVerdictHeadline) finalVerdictHeadline.textContent = offlineVerdict ? offlineVerdict.toUpperCase() : "ANALYZED";
+        if (reconciliationCaveatBadge) {
+          reconciliationCaveatBadge.className = "reconciliation-caveat-badge caveat";
+          reconciliationCaveatBadge.textContent = "○ No corroborating source found — verdict based on content pattern only";
+        }
+        if (signalCorroborationBadge) {
+          signalCorroborationBadge.className = "evidence-badge";
+          signalCorroborationBadge.textContent = "Live Wire: No Match";
+        }
+      } else if (isOfflineStatus) {
+        // Case 3: Offline mode fallback
+        const isReliable = !isOfflineMisleading;
+        setStampState(isReliable ? "verified" : "flagged", offlineVerdict, offlineConfidence);
+        if (finalVerdictHeadline) finalVerdictHeadline.textContent = offlineVerdict ? offlineVerdict.toUpperCase() : "ANALYZED";
+        if (reconciliationCaveatBadge) {
+          reconciliationCaveatBadge.className = "reconciliation-caveat-badge offline";
+          reconciliationCaveatBadge.textContent = "⚡ Corroboration check unavailable — offline mode.";
+        }
+        if (signalCorroborationBadge) {
+          signalCorroborationBadge.className = "evidence-badge";
+          signalCorroborationBadge.textContent = "Live Wire: Offline Mode";
+        }
+      }
+
     } catch (err) {
+      console.warn("Corroboration request error:", err);
       corroborationStatus.className = "corroboration-status-bar offline";
       corroborationStatus.textContent = "⚡ Corroboration check unavailable — offline mode.";
+
+      if (reconciliationCaveatBadge) {
+        reconciliationCaveatBadge.className = "reconciliation-caveat-badge offline";
+        reconciliationCaveatBadge.textContent = "⚡ Corroboration check unavailable — offline mode.";
+      }
+      if (signalCorroborationBadge) {
+        signalCorroborationBadge.className = "evidence-badge";
+        signalCorroborationBadge.textContent = "Live Wire: Offline Mode";
+      }
     } finally {
       corroborationLoading.classList.add("hidden");
       corroborationResult.classList.remove("hidden");

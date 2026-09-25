@@ -85,5 +85,53 @@ def test_endpoints():
     assert res_classify.status == 200
     print("  --> PASS: /classify execution is completely separate and unblocked.")
 
+    print("\n=================================================================")
+    print(" 4. TAMIL SIT CASE: Reconciliation into RELIABLE — CORROBORATED")
+    print("=================================================================")
+    tamil_sit_text = "கரூர் துப்பாக்கிச் சூடு வழக்கில் சிறப்பு புலனாய்வுக் குழு (SIT) விசாரணை தொடங்கியது"
+    
+    # Run /classify first
+    req_c = urllib.request.Request(
+        "http://127.0.0.1:5000/classify",
+        data=json.dumps({"text": tamil_sit_text}).encode("utf-8"),
+        headers={"Content-Type": "application/json"}
+    )
+    res_c = urllib.request.urlopen(req_c, timeout=5.0)
+    c_data = json.loads(res_c.read().decode("utf-8"))
+    print(f"Offline Classifier Raw Output:")
+    print(f"  Verdict    : {c_data.get('verdict')} ({c_data.get('confidence')}%)")
+    print(f"  Language   : {c_data.get('language')}")
+    
+    # Run /corroborate with offline signals
+    req_corr = urllib.request.Request(
+        "http://127.0.0.1:5000/corroborate",
+        data=json.dumps({
+            "text": tamil_sit_text,
+            "offline_verdict": c_data.get("verdict"),
+            "offline_confidence": c_data.get("confidence")
+        }).encode("utf-8"),
+        headers={"Content-Type": "application/json"}
+    )
+    res_corr = urllib.request.urlopen(req_corr, timeout=5.0)
+    corr_data = json.loads(res_corr.read().decode("utf-8"))
+    
+    reconciliation = corr_data.get("reconciliation", {})
+    print(f"Corroboration Search Output:")
+    print(f"  Found      : {corr_data.get('found')}")
+    print(f"  Sources    : {len(corr_data.get('sources', []))} source(s)")
+    for s in corr_data.get("sources", []):
+        print(f"    - [{s.get('name')}] {s.get('title')[:60]}...")
+    print(f"Final Reconciled Determination:")
+    print(f"  Final Verdict : {reconciliation.get('final_verdict')}")
+    print(f"  Stamp State   : {reconciliation.get('stamp_state')}")
+    print(f"  Stamp Title   : {reconciliation.get('stamp_title')}")
+    print(f"  Action        : {reconciliation.get('reconciliation_action')}")
+    print(f"  Status Note   : {reconciliation.get('reconciliation_note')}")
+    
+    assert len(corr_data.get("sources", [])) >= 2, "Expected 2+ sources for Tamil SIT news"
+    assert reconciliation.get("final_verdict") == "RELIABLE — CORROBORATED", "Expected RELIABLE — CORROBORATED"
+    assert reconciliation.get("stamp_state") == "corroborated", "Expected stamp state corroborated"
+    print("  --> PASS: Reconciled cleanly to 'RELIABLE — CORROBORATED' across 2 external sources!")
+
 if __name__ == "__main__":
     test_endpoints()

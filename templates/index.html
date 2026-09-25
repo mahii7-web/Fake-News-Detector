@@ -126,15 +126,23 @@
           
           <div class="dossier-top-bar">
             <div class="dossier-id" id="dossierId">DISPATCH RECORD #VV-0891</div>
-            <div class="dossier-security">UNCLASSIFIED // FOR VERIFICATION PURPOSES</div>
+            <div class="dossier-security" id="dossierSecurity">UNCLASSIFIED // FOR VERIFICATION PURPOSES</div>
           </div>
 
-          <!-- Verdict Section with Stamp -->
+          <!-- Final Combined Verdict Banner -->
           <div class="verdict-banner">
             <div class="verdict-meta-block">
               <div class="meta-label-mono">DETECTED LANGUAGE & SCRIPT</div>
               <div class="language-badge" id="detectedLanguage">English (en)</div>
               <div class="model-provenance-tag">via papluca/xlm-roberta-base</div>
+              
+              <div class="final-verdict-summary">
+                <div class="meta-label-mono final-label">FINAL CONSOLIDATED DETERMINATION</div>
+                <div class="final-verdict-headline" id="finalVerdictHeadline">RELIABLE NEWS</div>
+                <div class="reconciliation-caveat-badge" id="reconciliationCaveatBadge">
+                  ⚡ Running 100% offline — awaiting corroboration check...
+                </div>
+              </div>
             </div>
 
             <!-- Rubber Stamp Verdict -->
@@ -148,100 +156,143 @@
             </div>
           </div>
 
-          <!-- Polygraph Tick-Mark Confidence Meter -->
-          <div class="polygraph-section">
-            <div class="polygraph-header">
-              <span class="meter-title">CONFIDENCE SEISMOGRAPH / POLYGRAPH NEEDLE</span>
-              <span class="meter-readout" id="confidenceValue">00.0%</span>
-            </div>
-
-            <div class="meter-frame">
-              <!-- Ruler Tick Scale -->
-              <div class="meter-scale">
-                <div class="tick-group" style="left: 0%"><span>0%</span><div class="tick major"></div></div>
-                <div class="tick-group" style="left: 25%"><span>25%</span><div class="tick major"></div></div>
-                <div class="tick-group" style="left: 50%"><span>50% (UNCERTAIN)</span><div class="tick major"></div></div>
-                <div class="tick-group" style="left: 75%"><span>75%</span><div class="tick major"></div></div>
-                <div class="tick-group" style="left: 100%"><span>100% (CERTAIN)</span><div class="tick major"></div></div>
-                
-                <!-- Minor ticks -->
-                <div class="tick minor" style="left: 12.5%"></div>
-                <div class="tick minor" style="left: 37.5%"></div>
-                <div class="tick minor" style="left: 62.5%"></div>
-                <div class="tick minor" style="left: 87.5%"></div>
-              </div>
-
-              <!-- Sliding Needle Track -->
-              <div class="needle-track">
-                <div id="polygraphNeedle" class="polygraph-needle" style="left: 50%">
-                  <div class="needle-pointer">▲</div>
-                  <div class="needle-wire"></div>
-                  <div class="needle-tag" id="needleTag">50.0%</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="meter-legend">
-              <span class="legend-item"><span class="legend-box left-box"></span> 0-49%: Low Confidence / Ambiguous</span>
-              <span class="legend-item"><span class="legend-box right-box"></span> 50-100%: Strong Statistical Classification</span>
-            </div>
-          </div>
-
-          <!-- Redacted Document / Explainability Inspection -->
-          <div class="redaction-section">
-            <div class="redaction-header">
-              <div class="redaction-title-group">
+          <!-- Expandable Evidence Dossier -->
+          <div class="evidence-dossier">
+            <div class="evidence-section-header">
+              <div class="evidence-section-title">
                 <span class="bullet-square">■</span>
-                <h3>FORENSIC TEXT INSPECTION & REDACTION DOSSIER</h3>
+                <h3>SUPPORTING EVIDENCE & FORENSIC SIGNALS</h3>
               </div>
-              <div class="redaction-hint-mono">
-                [INTERACTIVE: HOVER / CLICK BLACK BARS TO REVEAL FLAGGED CONTENT]
-              </div>
-            </div>
-
-            <!-- Annotated Text Container with Solid Black Redaction Bars -->
-            <div id="redactedDocument" class="redacted-document-box">
-              <!-- Dynamic annotated text injected here -->
-            </div>
-
-            <!-- Flagged Clause Breakdown -->
-            <div id="flaggedNotesContainer" class="flagged-notes-container">
-              <div class="notes-heading">FLAGGED SENSATIONALISM & RHETORICAL ANOMALIES:</div>
-              <ul id="flaggedList" class="flagged-notes-list">
-                <!-- Injected flagged clauses -->
-              </ul>
-          </div>
-
-          <!-- Real-Time Corroboration Layer (Optional, Asynchronous, Second Signal) -->
-          <div class="corroboration-section">
-            <div class="corroboration-header">
-              <div class="corroboration-title-group">
-                <span class="bullet-square">■</span>
-                <h3>CORROBORATION CHECK (REQUIRES INTERNET)</h3>
-              </div>
-              <div class="corroboration-subnote">
-                Optional: requires internet for corroboration only
+              <div class="evidence-hint-mono">
+                [EXPANDABLE FORENSIC DOSSIER · SIGNAL 1 + SIGNAL 2]
               </div>
             </div>
 
-            <div id="corroborationContent" class="corroboration-body">
-              <!-- Loading State -->
-              <div id="corroborationLoading" class="corroboration-loading">
-                <span class="corroboration-spinner">›</span>
-                <span class="corroboration-loading-text">QUERYING LIVE NEWS INDEX FOR MATCHING COVERAGE...</span>
-                <span class="blinking-caret">█</span>
-              </div>
-
-              <!-- Result State -->
-              <div id="corroborationResult" class="corroboration-result hidden">
-                <div class="corroboration-status-bar" id="corroborationStatus">
-                  <!-- Injected status -->
+            <!-- Evidence Signal 1: Offline Model Raw Output -->
+            <details class="evidence-card" id="evidenceOfflineCard" open>
+              <summary class="evidence-card-header">
+                <div class="evidence-card-left">
+                  <span class="signal-tag">SIGNAL 1</span>
+                  <span class="evidence-card-label">Offline Linguistic Pattern & Rhetoric Model</span>
                 </div>
-                <div id="corroborationSourcesList" class="corroboration-sources-list">
-                  <!-- Injected sources -->
+                <div class="evidence-card-right">
+                  <span class="evidence-badge" id="signalOfflineBadge">Offline Analysis</span>
+                  <span class="accordion-icon">▾</span>
+                </div>
+              </summary>
+              <div class="evidence-card-content">
+                <!-- Polygraph Tick-Mark Confidence Meter -->
+                <div class="polygraph-section">
+                  <div class="polygraph-header">
+                    <span class="meter-title">CONFIDENCE SEISMOGRAPH / POLYGRAPH NEEDLE</span>
+                    <span class="meter-readout" id="confidenceValue">00.0%</span>
+                  </div>
+
+                  <div class="meter-frame">
+                    <!-- Ruler Tick Scale -->
+                    <div class="meter-scale">
+                      <div class="tick-group" style="left: 0%"><span>0%</span><div class="tick major"></div></div>
+                      <div class="tick-group" style="left: 25%"><span>25%</span><div class="tick major"></div></div>
+                      <div class="tick-group" style="left: 50%"><span>50% (UNCERTAIN)</span><div class="tick major"></div></div>
+                      <div class="tick-group" style="left: 75%"><span>75%</span><div class="tick major"></div></div>
+                      <div class="tick-group" style="left: 100%"><span>100% (CERTAIN)</span><div class="tick major"></div></div>
+                      
+                      <!-- Minor ticks -->
+                      <div class="tick minor" style="left: 12.5%"></div>
+                      <div class="tick minor" style="left: 37.5%"></div>
+                      <div class="tick minor" style="left: 62.5%"></div>
+                      <div class="tick minor" style="left: 87.5%"></div>
+                    </div>
+
+                    <!-- Sliding Needle Track -->
+                    <div class="needle-track">
+                      <div id="polygraphNeedle" class="polygraph-needle" style="left: 50%">
+                        <div class="needle-pointer">▲</div>
+                        <div class="needle-wire"></div>
+                        <div class="needle-tag" id="needleTag">50.0%</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="meter-legend">
+                    <span class="legend-item"><span class="legend-box left-box"></span> 0-49%: Low Confidence / Ambiguous</span>
+                    <span class="legend-item"><span class="legend-box right-box"></span> 50-100%: Strong Statistical Classification</span>
+                  </div>
+                </div>
+
+                <!-- Redacted Document / Explainability Inspection -->
+                <div class="redaction-section">
+                  <div class="redaction-header">
+                    <div class="redaction-title-group">
+                      <span class="bullet-square">■</span>
+                      <h3>FORENSIC TEXT INSPECTION & REDACTION DOSSIER</h3>
+                    </div>
+                    <div class="redaction-hint-mono">
+                      [INTERACTIVE: HOVER / CLICK BLACK BARS TO REVEAL FLAGGED CONTENT]
+                    </div>
+                  </div>
+
+                  <!-- Annotated Text Container with Solid Black Redaction Bars -->
+                  <div id="redactedDocument" class="redacted-document-box">
+                    <!-- Dynamic annotated text injected here -->
+                  </div>
+
+                  <!-- Flagged Clause Breakdown -->
+                  <div id="flaggedNotesContainer" class="flagged-notes-container">
+                    <div class="notes-heading">FLAGGED SENSATIONALISM & RHETORICAL ANOMALIES:</div>
+                    <ul id="flaggedList" class="flagged-notes-list">
+                      <!-- Injected flagged clauses -->
+                    </ul>
+                  </div>
                 </div>
               </div>
-            </div>
+            </details>
+
+            <!-- Evidence Signal 2: Real-Time Corroboration Result -->
+            <details class="evidence-card" id="evidenceCorroborationCard" open>
+              <summary class="evidence-card-header">
+                <div class="evidence-card-left">
+                  <span class="signal-tag">SIGNAL 2</span>
+                  <span class="evidence-card-label">Real-Time Press Corroboration Check</span>
+                </div>
+                <div class="evidence-card-right">
+                  <span class="evidence-badge" id="signalCorroborationBadge">Live Wire: Querying...</span>
+                  <span class="accordion-icon">▾</span>
+                </div>
+              </summary>
+              <div class="evidence-card-content">
+                <div class="corroboration-section">
+                  <div class="corroboration-header">
+                    <div class="corroboration-title-group">
+                      <span class="bullet-square">■</span>
+                      <h3>LIVE NEWS WIRE CORROBORATION (REQUIRES INTERNET)</h3>
+                    </div>
+                    <div class="corroboration-subnote">
+                      Optional: requires internet for corroboration only
+                    </div>
+                  </div>
+
+                  <div id="corroborationContent" class="corroboration-body">
+                    <!-- Loading State -->
+                    <div id="corroborationLoading" class="corroboration-loading">
+                      <span class="corroboration-spinner">›</span>
+                      <span class="corroboration-loading-text">QUERYING LIVE NEWS INDEX FOR MATCHING COVERAGE...</span>
+                      <span class="blinking-caret">█</span>
+                    </div>
+
+                    <!-- Result State -->
+                    <div id="corroborationResult" class="corroboration-result hidden">
+                      <div class="corroboration-status-bar" id="corroborationStatus">
+                        <!-- Injected status -->
+                      </div>
+                      <div id="corroborationSourcesList" class="corroboration-sources-list">
+                        <!-- Injected sources -->
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </details>
           </div>
 
         </section>

@@ -19,6 +19,8 @@
   /* Strictly restricted accents: ONLY for verdict stamp and confidence polygraph meter */
   --accent-reliable: #2D5A3D;
   --accent-misleading: #B3261E;
+  --accent-corroborated: #1A365D; /* deep newsprint indigo / navy */
+  --accent-review: #B45309; /* editorial amber / ochre */
   
   /* Fonts */
   --font-serif: 'Fraunces', Georgia, 'Times New Roman', serif;
@@ -476,6 +478,68 @@ kbd {
   margin-top: 4px;
 }
 
+/* Final Consolidated Verdict Display */
+.final-verdict-summary {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--rule-line-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.final-label {
+  color: var(--ink-primary);
+  font-weight: 700;
+}
+
+.final-verdict-headline {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  line-height: 1.15;
+  color: var(--ink-primary);
+}
+
+.reconciliation-caveat-badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.45;
+  padding: 6px 10px;
+  background-color: var(--bg-newsprint);
+  border-left: 3px solid var(--rule-line);
+  color: var(--ink-secondary);
+  margin-top: 4px;
+  max-width: 480px;
+}
+
+.reconciliation-caveat-badge.reconciled {
+  border-left-color: var(--accent-corroborated);
+  color: var(--accent-corroborated);
+  background-color: #EBF3FA;
+  font-weight: 600;
+}
+
+.reconciliation-caveat-badge.caveat {
+  border-left-color: var(--ink-muted);
+  color: var(--ink-secondary);
+  font-style: italic;
+}
+
+.reconciliation-caveat-badge.offline {
+  border-left-color: var(--ink-muted);
+  color: var(--ink-muted);
+  font-style: italic;
+}
+
+.reconciliation-caveat-badge.review {
+  border-left-color: var(--accent-review);
+  color: var(--accent-review);
+  background-color: #FEF3C7;
+  font-weight: 600;
+}
+
 /* Rubber Stamp Styling: Rotated, Border, Faded/Worn Opacity */
 .stamp-container {
   display: flex;
@@ -516,6 +580,26 @@ kbd {
   opacity: 0.94;
   border-style: dashed;
   box-shadow: 0 0 0 2px var(--accent-misleading);
+}
+
+/* Corroborated News Stamp: Distinct Neutral / Deep Slate Blue (#1A365D), Rotated -1.8deg */
+.stamp-corroborated {
+  color: var(--accent-corroborated);
+  border-color: var(--accent-corroborated);
+  transform: rotate(-1.8deg);
+  opacity: 0.96;
+  border-style: double;
+  box-shadow: 0 0 0 2px var(--accent-corroborated);
+}
+
+/* Dual Signal / Manual Review Stamp: Editorial Amber / Ochre (#B45309), Rotated +1.5deg */
+.stamp-review {
+  color: var(--accent-review);
+  border-color: var(--accent-review);
+  transform: rotate(1.5deg);
+  opacity: 0.95;
+  border-style: dashed;
+  box-shadow: 0 0 0 2px var(--accent-review);
 }
 
 .stamp-stars {
@@ -859,10 +943,153 @@ kbd {
 }
 
 /* ==========================================================================
+   Expandable Evidence Dossier (Dual Signal: Offline Model + Live Corroboration)
+   ========================================================================== */
+.evidence-dossier {
+  border-top: 2px solid var(--rule-line);
+  background-color: var(--bg-newsprint);
+}
+
+.evidence-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  background-color: var(--bg-desk-panel);
+  border-bottom: 1px solid var(--rule-line);
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.evidence-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.evidence-section-title h3 {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: var(--ink-primary);
+}
+
+.evidence-hint-mono {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 1px;
+  color: var(--ink-muted);
+}
+
+/* Expandable Signal Cards */
+.evidence-card {
+  border-bottom: 1px solid var(--rule-line);
+  background-color: var(--bg-card-paper);
+}
+
+.evidence-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  background-color: #EDE8DE;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid var(--rule-line-subtle);
+  list-style: none;
+}
+
+.evidence-card-header::-webkit-details-marker {
+  display: none;
+}
+
+.evidence-card-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.signal-tag {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  background-color: var(--ink-primary);
+  color: var(--bg-newsprint);
+  padding: 2px 6px;
+}
+
+.evidence-card-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--ink-primary);
+}
+
+.evidence-card-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.evidence-badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border: 1px solid var(--rule-line-subtle);
+  background-color: var(--bg-card-paper);
+  color: var(--ink-secondary);
+}
+
+.evidence-badge.badge-reliable {
+  border-color: var(--accent-reliable);
+  color: var(--accent-reliable);
+  background-color: #F1F7F2;
+}
+
+.evidence-badge.badge-misleading {
+  border-color: var(--accent-misleading);
+  color: var(--accent-misleading);
+  background-color: #FDF2F2;
+}
+
+.evidence-badge.badge-corroborated {
+  border-color: var(--accent-corroborated);
+  color: var(--accent-corroborated);
+  background-color: #EBF3FA;
+}
+
+.evidence-badge.badge-review {
+  border-color: var(--accent-review);
+  color: var(--accent-review);
+  background-color: #FEF3C7;
+}
+
+.accordion-icon {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  transition: transform 0.2s ease;
+  display: inline-block;
+}
+
+details[open] .accordion-icon {
+  transform: rotate(180deg);
+}
+
+.evidence-card-content {
+  background-color: var(--bg-card-paper);
+}
+
+/* ==========================================================================
    Real-Time Corroboration Layer (Optional Second Signal)
    ========================================================================== */
 .corroboration-section {
-  border-top: 2px dashed var(--rule-line);
   padding: 18px 24px;
   background-color: var(--bg-newsprint);
 }
