@@ -1,0 +1,42 @@
+[
+  {
+    "id": "hi-2",
+    "language": "Hindi",
+    "lang_code": "hi",
+    "expected": "Misleading / Fake News",
+    "category": "वायरल अफवाह (Viral Hoax)",
+    "text": "सावधान! 500 रुपये के वे सभी नए नोट पूरी तरह अमान्य और नकली हैं जिनमें हरी सुरक्षा पट्टी गांधी जी की तस्वीर के पास नहीं है, तुरंत साझा करें!"
+  },
+  {
+    "id": "en-5",
+    "language": "English",
+    "lang_code": "en",
+    "expected": "Reliable News",
+    "category": "Global Health & Science",
+    "text": "World Health Organization issues updated global clinical guidelines for managing antimicrobial resistance in hospital care."
+  },
+  {
+    "id": "hi-5",
+    "language": "Hindi",
+    "lang_code": "hi",
+    "expected": "Reliable News",
+    "category": "कृषि व अर्थव्यवस्था (Economy)",
+    "text": "केंद्र सरकार ने देश भर के 8 करोड़ से अधिक पात्र किसानों के बैंक खातों में पीएम-किसान सम्मान निधि की 16वीं किस्त हस्तांतरित की।"
+  },
+  {
+    "id": "en-4",
+    "language": "English",
+    "lang_code": "en",
+    "expected": "Misleading / Fake News",
+    "category": "Conspiracy & Rumor",
+    "text": "URGENT WARNING: United Nations mandates secret digital microchip implants for all airline passengers worldwide starting next Monday or passports will be canceled."
+  },
+  {
+    "id": "ta-3",
+    "language": "Tamil",
+    "lang_code": "ta",
+    "expected": "Reliable News",
+    "category": "போக்குவரத்து (Public Transit)",
+    "text": "சென்னை மாநகரில் பொதுமக்களின் வசதிக்காக 100 புதிய தாழ்தள மின்சாரப் பேருந்துகளின் சேவையை முதலமைச்சர் தொடங்கி வைத்தார்."
+  }
+]

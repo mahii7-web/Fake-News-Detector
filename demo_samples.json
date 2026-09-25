@@ -1,0 +1,122 @@
+[
+  {
+    "id": "en-1",
+    "language": "English",
+    "lang_code": "en",
+    "expected": "Reliable News",
+    "category": "Science & Space",
+    "text": "NASA's James Webb Space Telescope discovers the oldest known active supermassive black hole in the early universe."
+  },
+  {
+    "id": "en-2",
+    "language": "English",
+    "lang_code": "en",
+    "expected": "Misleading / Fake News",
+    "category": "Health Hoax",
+    "text": "SHOCKING SECRET: Drinking boiled garlic water with Himalayan salt completely eliminates all cancer cells and diabetes in 48 hours without doctors!"
+  },
+  {
+    "id": "en-3",
+    "language": "English",
+    "lang_code": "en",
+    "expected": "Reliable News",
+    "category": "Economy",
+    "text": "The Reserve Bank of India keeps the repo rate unchanged at 6.5 percent, citing steady domestic growth and controlled inflation."
+  },
+  {
+    "id": "en-4",
+    "language": "English",
+    "lang_code": "en",
+    "expected": "Misleading / Fake News",
+    "category": "Conspiracy",
+    "text": "URGENT WARNING: United Nations mandates secret digital microchip implants for all airline passengers worldwide starting next Monday or passports will be canceled."
+  },
+  {
+    "id": "en-5",
+    "language": "English",
+    "lang_code": "en",
+    "expected": "Reliable News",
+    "category": "Global Health",
+    "text": "World Health Organization issues updated global clinical guidelines for managing antimicrobial resistance in hospital care."
+  },
+  {
+    "id": "hi-1",
+    "language": "Hindi",
+    "lang_code": "hi",
+    "expected": "Reliable News",
+    "category": "विज्ञान व अंतरिक्ष",
+    "text": "भारतीय अंतरिक्ष अनुसंधान संगठन (ISRO) ने मौसम उपग्रह INSAT-3DS का श्रीहरिकोटा से सफल प्रक्षेपण किया।"
+  },
+  {
+    "id": "hi-2",
+    "language": "Hindi",
+    "lang_code": "hi",
+    "expected": "Misleading / Fake News",
+    "category": "वायरल अफवाह",
+    "text": "सावधान! 500 रुपये के वे सभी नए नोट पूरी तरह अमान्य और नकली हैं जिनमें हरी सुरक्षा पट्टी गांधी जी की तस्वीर के पास नहीं है, तुरंत साझा करें!"
+  },
+  {
+    "id": "hi-3",
+    "language": "Hindi",
+    "lang_code": "hi",
+    "expected": "Reliable News",
+    "category": "बैंकिंग व सुरक्षा",
+    "text": "भारतीय रिजर्व बैंक ने वाणिज्यिक बैंकों को यूपीआई लेनदेन निगरानी और साइबर सुरक्षा ढांचे को मजबूत करने के सख्त निर्देश जारी किए।"
+  },
+  {
+    "id": "hi-4",
+    "language": "Hindi",
+    "lang_code": "hi",
+    "expected": "Misleading / Fake News",
+    "category": "खगोलीय अफवाह",
+    "text": "नासा ने अंतिम चेतावनी जारी की: दुर्लभ सौर तूफान के कारण अगले सप्ताह पूरे देश में 72 घंटे तक पूर्ण अंधकार रहेगा और मोबाइल टावर बंद रहेंगे।"
+  },
+  {
+    "id": "hi-5",
+    "language": "Hindi",
+    "lang_code": "hi",
+    "expected": "Reliable News",
+    "category": "कृषि व अर्थव्यवस्था",
+    "text": "केंद्र सरकार ने देश भर के 8 करोड़ से अधिक पात्र किसानों के बैंक खातों में पीएम-किसान सम्मान निधि की 16वीं किस्त हस्तांतरित की।"
+  },
+  {
+    "id": "ta-1",
+    "language": "Tamil",
+    "lang_code": "ta",
+    "expected": "Reliable News",
+    "category": "விண்வெளி ஆய்வு",
+    "text": "இஸ்ரோவின் சந்திரயான்-3 விண்கலம் நிலவின் தென் துருவத்தில் வெற்றிகரமாக தரையிறங்கி தனது அறிவியல் சோதனைகளை நிறைவு செய்தது."
+  },
+  {
+    "id": "ta-2",
+    "language": "Tamil",
+    "lang_code": "ta",
+    "expected": "Misleading / Fake News",
+    "category": "போலி மருத்துவ தகவல்",
+    "text": "அதிர்ச்சி தகவல்: தினமும் காலையில் எலுமிச்சை சாற்றுடன் உப்பு கலந்து குடித்தால் 24 மணி நேரத்தில் இதய அடைப்புகள் அனைத்தும் அறுவை சிகிச்சை இன்றி உடனே குணமாகும்!"
+  },
+  {
+    "id": "ta-3",
+    "language": "Tamil",
+    "lang_code": "ta",
+    "expected": "Reliable News",
+    "category": "போக்குவரத்து",
+    "text": "சென்னை மாநகரில் பொதுமக்களின் வசதிக்காக 100 புதிய தாழ்தள மின்சாரப் பேருந்துகளின் சேவையை முதலமைச்சர் தொடங்கி வைத்தார்."
+  },
+  {
+    "id": "ta-4",
+    "language": "Tamil",
+    "lang_code": "ta",
+    "expected": "Misleading / Fake News",
+    "category": "வாட்ஸ்அப் வதந்தி",
+    "text": "யுனெஸ்கோ அமைப்பு இந்திய தேசிய கீதத்தை உலகின் மிகச் சிறந்த தேசிய கீதமாக அதிகாரப்பூர்வமாக தேர்வு செய்து விருது அறிவித்துள்ளது, தமிழர்களே பகிருங்கள்!"
+  },
+  {
+    "id": "ta-5",
+    "language": "Tamil",
+    "lang_code": "ta",
+    "expected": "Reliable News",
+    "category": "நகர்ப்புற வளர்ச்சி",
+    "text": "சென்னையில் 116 கிலோமீட்டர் தொலைவிலான இரண்டாம் கட்ட மெட்ரோ ரயில் திட்டப் பணிகள் இலக்கு நிர்ணயிக்கப்பட்டு தீவிரமாக நடைபெற்று வருகின்றன."
+  }
+]
