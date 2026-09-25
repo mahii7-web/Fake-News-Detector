@@ -31,6 +31,11 @@ This project addresses Problem Statement AI-03: developing an AI system capable 
 ├── demo_samples.json      # 15 curated real/fake news headlines across English, Hindi, and Tamil
 ├── README.md              # Project documentation and evaluation overview
 ├── requirements.txt       # Python project dependencies
+├── static/
+│   ├── app.js             # Vanilla frontend controller, API client & animations
+│   └── style.css          # Newspaper verification desk editorial stylesheet
+├── templates/
+│   └── index.html         # Editorial newsroom desk HTML template
 ├── test_backend.py        # Integration test suite running all 15 demo samples via Flask test client
 └── validate_models.py     # Standalone offline model validation script
 ```

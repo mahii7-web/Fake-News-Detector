@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VaraVaakku — The Newsroom Verification Desk</title>
+  <meta name="description" content="Offline-first multilingual fake news and misinformation detection desk for Tamil, Hindi, and English.">
+  
+  <!-- Primary Fonts with System Fallbacks for Offline Resilience -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+  <!-- Top Page Container -->
+  <div class="page-container">
+
+    <!-- Top Dateline / Masthead Header -->
+    <header class="masthead">
+      <div class="masthead-meta-top">
+        <span class="meta-item">VOL. I — NO. 042</span>
+        <span class="meta-item center-meta">OFFLINE-FIRST FORENSIC INTELLIGENCE DESK</span>
+        <span class="meta-item right-meta">EDITION: LOCAL COMPUTE · NO CLOUD APIS</span>
+      </div>
+
+      <div class="masthead-main">
+        <div class="masthead-side-seal left-seal">
+          <span class="seal-icon">✦</span>
+          <span class="seal-text">TAMIL<br>HINDI<br>ENGLISH</span>
+        </div>
+
+        <div class="masthead-titles">
+          <h1 class="newspaper-title">VaraVaakku</h1>
+          <p class="newspaper-subhead">THE VERIFICATION DESK</p>
+          <p class="newspaper-deck">
+            Multilingual Misinformation Analysis, Script Forensic Layer & Linguistic Authenticity Engine
+          </p>
+        </div>
+
+        <div class="masthead-side-seal right-seal">
+          <span class="seal-icon">★</span>
+          <span class="seal-text">ZERO LEAK<br>STANDALONE<br>DETERMINISTIC</span>
+        </div>
+      </div>
+
+      <div class="masthead-meta-bottom">
+        <span class="meta-rule-text">AI-03 BENCHMARK EVALUATION</span>
+        <span class="meta-rule-sep">◆</span>
+        <span class="meta-rule-text">TRANSFORMER ZERO-SHOT NLI</span>
+        <span class="meta-rule-sep">◆</span>
+        <span class="meta-rule-text">REDACTION EXPLAINABILITY</span>
+        <span class="meta-rule-sep">◆</span>
+        <span class="meta-rule-text">TAMIL NADU HACKATHON 2026</span>
+      </div>
+    </header>
+
+    <!-- Main Editorial Layout: Desk (Left/Center) + Evidence Index Cards (Right) -->
+    <div class="editorial-grid">
+
+      <!-- LEFT: The Active Verification Desk -->
+      <main class="verification-desk">
+
+        <section class="desk-panel dispatch-input-panel">
+          <div class="panel-header">
+            <div class="dispatch-header-title">
+              <span class="bullet-square">■</span>
+              <h2>INCOMING DISPATCH FOR SCRUTINY</h2>
+            </div>
+            <div class="dispatch-header-status" id="bufferStatus">
+              BUFFER: READY (0 CHARS)
+            </div>
+          </div>
+
+          <div class="input-wrapper">
+            <textarea 
+              id="inputText" 
+              class="dispatch-textarea" 
+              rows="5" 
+              placeholder="Paste news dispatch, viral forward, or claim in English, Hindi (हिंदी), or Tamil (தமிழ்)..."
+              spellcheck="false"
+            ></textarea>
+          </div>
+
+          <div class="desk-actions">
+            <div class="desk-buttons-left">
+              <button id="classifyBtn" class="btn-newspaper primary-btn" type="button">
+                <span class="btn-prefix">▶</span>
+                <span class="btn-label">VERIFY DISPATCH</span>
+              </button>
+              <button id="clearBtn" class="btn-newspaper secondary-btn" type="button">
+                CLEAR
+              </button>
+            </div>
+            <div class="desk-input-hints">
+              <span>Shortcuts: Press <kbd>Ctrl</kbd> + <kbd>Enter</kbd> to analyze</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Loading Monospace Readout -->
+        <div id="loadingState" class="loading-state hidden">
+          <div class="typewriter-line">
+            <span class="cursor-symbol">›</span>
+            <span class="analyzing-text">ANALYZING DISPATCH...</span>
+            <span class="blinking-caret">█</span>
+          </div>
+          <div class="sub-log-stream">
+            [SYS] Ingesting unicode script → Papluca Language ID → DeBERTa XNLI Hypothesis → Checking Rhetoric
+          </div>
+        </div>
+
+        <!-- Error State Notice -->
+        <div id="errorState" class="error-notice hidden">
+          <div class="error-badge">! SYSTEM ALERT</div>
+          <div id="errorMessage" class="error-text">An unexpected error occurred during model inference.</div>
+        </div>
+
+        <!-- Classification Results Dossier -->
+        <section id="resultsSection" class="desk-panel results-dossier hidden">
+          
+          <div class="dossier-top-bar">
+            <div class="dossier-id" id="dossierId">DISPATCH RECORD #VV-0891</div>
+            <div class="dossier-security">UNCLASSIFIED // FOR VERIFICATION PURPOSES</div>
+          </div>
+
+          <!-- Verdict Section with Stamp -->
+          <div class="verdict-banner">
+            <div class="verdict-meta-block">
+              <div class="meta-label-mono">DETECTED LANGUAGE & SCRIPT</div>
+              <div class="language-badge" id="detectedLanguage">English (en)</div>
+              <div class="model-provenance-tag">via papluca/xlm-roberta-base</div>
+            </div>
+
+            <!-- Rubber Stamp Verdict -->
+            <div class="stamp-container">
+              <div id="verdictStamp" class="rubber-stamp stamp-verified">
+                <span class="stamp-stars">★★★</span>
+                <span class="stamp-title" id="stampTitle">VERIFIED</span>
+                <span class="stamp-verdict-text" id="stampVerdictText">RELIABLE NEWS</span>
+                <span class="stamp-code" id="stampCode">DESK APPROVAL</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Polygraph Tick-Mark Confidence Meter -->
+          <div class="polygraph-section">
+            <div class="polygraph-header">
+              <span class="meter-title">CONFIDENCE SEISMOGRAPH / POLYGRAPH NEEDLE</span>
+              <span class="meter-readout" id="confidenceValue">00.0%</span>
+            </div>
+
+            <div class="meter-frame">
+              <!-- Ruler Tick Scale -->
+              <div class="meter-scale">
+                <div class="tick-group" style="left: 0%"><span>0%</span><div class="tick major"></div></div>
+                <div class="tick-group" style="left: 25%"><span>25%</span><div class="tick major"></div></div>
+                <div class="tick-group" style="left: 50%"><span>50% (UNCERTAIN)</span><div class="tick major"></div></div>
+                <div class="tick-group" style="left: 75%"><span>75%</span><div class="tick major"></div></div>
+                <div class="tick-group" style="left: 100%"><span>100% (CERTAIN)</span><div class="tick major"></div></div>
+                
+                <!-- Minor ticks -->
+                <div class="tick minor" style="left: 12.5%"></div>
+                <div class="tick minor" style="left: 37.5%"></div>
+                <div class="tick minor" style="left: 62.5%"></div>
+                <div class="tick minor" style="left: 87.5%"></div>
+              </div>
+
+              <!-- Sliding Needle Track -->
+              <div class="needle-track">
+                <div id="polygraphNeedle" class="polygraph-needle" style="left: 50%">
+                  <div class="needle-pointer">▲</div>
+                  <div class="needle-wire"></div>
+                  <div class="needle-tag" id="needleTag">50.0%</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="meter-legend">
+              <span class="legend-item"><span class="legend-box left-box"></span> 0-49%: Low Confidence / Ambiguous</span>
+              <span class="legend-item"><span class="legend-box right-box"></span> 50-100%: Strong Statistical Classification</span>
+            </div>
+          </div>
+
+          <!-- Redacted Document / Explainability Inspection -->
+          <div class="redaction-section">
+            <div class="redaction-header">
+              <div class="redaction-title-group">
+                <span class="bullet-square">■</span>
+                <h3>FORENSIC TEXT INSPECTION & REDACTION DOSSIER</h3>
+              </div>
+              <div class="redaction-hint-mono">
+                [INTERACTIVE: HOVER / CLICK BLACK BARS TO REVEAL FLAGGED CONTENT]
+              </div>
+            </div>
+
+            <!-- Annotated Text Container with Solid Black Redaction Bars -->
+            <div id="redactedDocument" class="redacted-document-box">
+              <!-- Dynamic annotated text injected here -->
+            </div>
+
+            <!-- Flagged Clause Breakdown -->
+            <div id="flaggedNotesContainer" class="flagged-notes-container">
+              <div class="notes-heading">FLAGGED SENSATIONALISM & RHETORICAL ANOMALIES:</div>
+              <ul id="flaggedList" class="flagged-notes-list">
+                <!-- Injected flagged clauses -->
+              </ul>
+            </div>
+          </div>
+
+        </section>
+
+      </main>
+
+      <!-- RIGHT: Press Clipping & Wire Archive (Demo Samples) -->
+      <aside class="wire-archive">
+        
+        <div class="archive-header">
+          <div class="archive-headline">
+            <span class="bullet-square">■</span>
+            <h3>EVIDENCE WIRE ARCHIVE</h3>
+          </div>
+          <p class="archive-subtext">Click any docket tab below to load into the verification desk and analyze instantly.</p>
+        </div>
+
+        <!-- Language Filter Tabs -->
+        <div class="archive-tabs" id="langTabs">
+          <button class="tab-btn active" data-filter="all">ALL (15)</button>
+          <button class="tab-btn" data-filter="en">ENGLISH (5)</button>
+          <button class="tab-btn" data-filter="hi">HINDI (5)</button>
+          <button class="tab-btn" data-filter="ta">TAMIL (5)</button>
+        </div>
+
+        <!-- Sample Cards Feed -->
+        <div class="sample-cards-container" id="samplesContainer">
+          <div class="loading-samples-msg">Loading wire archive...</div>
+        </div>
+
+        <div class="archive-footer-note">
+          <p><strong>Offline Determinism:</strong> All 15 samples run locally with zero latency spikes or external dependencies.</p>
+        </div>
+
+      </aside>
+
+    </div>
+
+    <!-- Editorial Footer -->
+    <footer class="editorial-footer">
+      <div class="footer-top-rule"></div>
+      <div class="footer-columns">
+        <div class="footer-col">
+          <h4>SYSTEM PROVENANCE</h4>
+          <p>Offline transformer pipelines for regional language verification. Models: <code>mDeBERTa-v3-base-mnli-xnli</code> & <code>xlm-roberta-base</code>.</p>
+        </div>
+        <div class="footer-col">
+          <h4>ZERO PAID APIS</h4>
+          <p>No Google Cloud Translation, no OpenAI, no external network requests. Built for high-reliability evaluation.</p>
+        </div>
+        <div class="footer-col">
+          <h4>THE VERIFICATION TEAM</h4>
+          <p>Arunmozhidevan S · Mahilesh · Kabilan · Kamalnath</p>
+        </div>
+      </div>
+      <div class="footer-bottom-line">
+        © 2026 VARAVAAKKU EDITORIAL VERIFICATION DESK · PROBLEM STATEMENT AI-03
+      </div>
+    </footer>
+
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

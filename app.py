@@ -3,7 +3,7 @@ import os
 import re
 import sys
 import torch
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 
 app = Flask(__name__)
 
@@ -136,6 +136,11 @@ def extract_flagged_phrases(text: str) -> list[str]:
                 break
 
     return flagged[:3]
+
+@app.route("/", methods=["GET"])
+def index():
+    """Serves the newsroom verification desk editorial dashboard."""
+    return render_template("index.html")
 
 @app.route("/samples", methods=["GET"])
 def get_samples():
