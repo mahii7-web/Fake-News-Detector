@@ -1,0 +1,30 @@
+# Virtual environment
+.venv/
+venv/
+env/
+ENV/
+
+# Byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Model caches & HuggingFace
+models/
+model_cache/
+.cache/
+hf_cache/
+*.bin
+*.safetensors
+*.pt
+*.onnx
+
+# Environment variables
+.env
+.env.local
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
