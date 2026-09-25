@@ -5,13 +5,33 @@ import sys
 import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
+import psutil
 import torch
 from flask import Flask, request, jsonify, render_template
+from flask_cors import CORS
 
 app = Flask(__name__)
+# Enable CORS for cross-origin requests from Vercel frontend or any origin
+CORS(app, resources={r"/*": {"origins": "*"}})
 
-# Verify no external network calls: Everything runs on local compute and offline models
+def log_system_memory(checkpoint: str):
+    """Logs available system memory and current process RSS for deployment diagnostics."""
+    try:
+        vm = psutil.virtual_memory()
+        proc = psutil.Process()
+        proc_rss_mb = proc.memory_info().rss / (1024 * 1024)
+        avail_mb = vm.available / (1024 * 1024)
+        total_mb = vm.total / (1024 * 1024)
+        print(f"[Memory - {checkpoint}] Process RSS: {proc_rss_mb:.1f} MB | System Avail: {avail_mb:.1f} MB / {total_mb:.1f} MB Total")
+        if total_mb <= 600:
+            print(f"[Memory Alert - {checkpoint}] Low memory host detected ({total_mb:.0f} MB total, matching Render 512MB free tier).")
+            print(f"[Memory Alert - {checkpoint}] Note: Combined model footprint (~2.5 GB) will exceed 512MB RAM and risk SIGKILL (OOM).")
+    except Exception as _me:
+        print(f"[Memory Check Note]: {_me}")
+
+# Verify compute device and log initial memory state
 print("[Init] Starting Multilingual Fake News Detector Backend...")
+log_system_memory("Startup")
 
 # Determine compute device
 device = 0 if torch.cuda.is_available() else -1
@@ -23,12 +43,24 @@ NLI_MODEL_NAME = "MoritzLaurer/mDeBERTa-v3-base-mnli-xnli"
 # Load models ONCE at module level to eliminate reload lag in live demo
 print(f"[Model 1/2] Loading language identification model: {LANG_MODEL_NAME}...")
 from transformers import pipeline
-lang_pipe = pipeline("text-classification", model=LANG_MODEL_NAME, device=device)
-print("[Model 1/2] Language identification model loaded successfully.")
+try:
+    lang_pipe = pipeline("text-classification", model=LANG_MODEL_NAME, device=device)
+    print("[Model 1/2] Language identification model loaded successfully.")
+    log_system_memory("Post-Model 1")
+except Exception as e:
+    print(f"[CRITICAL ERROR] Failed to load Model 1 ({LANG_MODEL_NAME}): {e}", file=sys.stderr)
+    log_system_memory("Model 1 Failure")
+    raise
 
 print(f"[Model 2/2] Loading multilingual zero-shot classifier: {NLI_MODEL_NAME}...")
-classifier_pipe = pipeline("zero-shot-classification", model=NLI_MODEL_NAME, device=device)
-print("[Model 2/2] Multilingual classifier loaded successfully.")
+try:
+    classifier_pipe = pipeline("zero-shot-classification", model=NLI_MODEL_NAME, device=device)
+    print("[Model 2/2] Multilingual classifier loaded successfully.")
+    log_system_memory("Post-Model 2")
+except Exception as e:
+    print(f"[CRITICAL ERROR] Failed to load Model 2 ({NLI_MODEL_NAME}): {e}", file=sys.stderr)
+    log_system_memory("Model 2 Failure")
+    raise
 
 # Warm-up pass to eliminate cold-start inference lag during live evaluation
 print("[Warm-up] Executing startup warm-up inference pass...")
@@ -37,6 +69,7 @@ try:
     _ = lang_pipe(_dummy_text[:512])
     _ = classifier_pipe(_dummy_text[:512], candidate_labels=["reliable news", "misleading/fake news"])
     print("Models warmed up and ready")
+    log_system_memory("Post-Warmup Ready")
 except Exception as _we:
     print(f"[Warm-up Note]: {_we}")
 
@@ -447,6 +480,25 @@ def corroborate():
             )
         return jsonify(fallback_result), 200
 
+@app.route("/health", methods=["GET"])
+def health():
+    """Health check endpoint with system memory telemetry."""
+    try:
+        vm = psutil.virtual_memory()
+        proc = psutil.Process()
+        return jsonify({
+            "status": "healthy",
+            "service": "varavaakku-backend",
+            "device": "cuda" if device == 0 else "cpu",
+            "process_rss_mb": round(proc.memory_info().rss / (1024 * 1024), 2),
+            "system_available_mb": round(vm.available / (1024 * 1024), 2),
+            "system_total_mb": round(vm.total / (1024 * 1024), 2),
+            "low_memory_tier": vm.total / (1024 * 1024) <= 600
+        }), 200
+    except Exception as e:
+        return jsonify({"status": "ok", "error": str(e)}), 200
+
 if __name__ == "__main__":
-    print("\nStarting Flask web server on http://127.0.0.1:5000 ...")
-    app.run(host="0.0.0.0", port=5000, debug=False)
+    port = int(os.environ.get("PORT", 5000))
+    print(f"\nStarting Flask web server on port {port} (http://0.0.0.0:{port}) ...")
+    app.run(host="0.0.0.0", port=port, debug=False)
