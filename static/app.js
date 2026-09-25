@@ -51,12 +51,12 @@ document.addEventListener("DOMContentLoaded", () => {
   let dispatchCounter = 1042;
 
   // Backend API URL: uses relative path when hosted on Flask localhost,
-  // and points to Render backend URL when deployed as split architecture on Vercel.
+  // and points to live tunnel/Render when deployed as split architecture on Vercel.
   const API_BASE_URL = window.API_BASE_URL ||
     localStorage.getItem("varavaakku_api_url") ||
     ((window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
       ? ""
-      : "https://varavaakku-backend.onrender.com");
+      : "https://clear-rockets-punch.loca.lt");
 
   // 1. Textarea Input Buffer Counter
   function updateBufferStatus() {
@@ -88,7 +88,9 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const endpoint = loadAll ? "/samples?all=true" : "/samples";
       const url = `${API_BASE_URL}${endpoint}`;
-      const res = await fetch(url);
+      const res = await fetch(url, {
+        headers: { "Bypass-Tunnel-Reminder": "true" }
+      });
       if (!res.ok) throw new Error("Failed to load wire samples");
       allSamples = await res.json();
       
@@ -197,7 +199,10 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const response = await fetch(`${API_BASE_URL}/classify`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Bypass-Tunnel-Reminder": "true"
+        },
         body: JSON.stringify({ text: text })
       });
 
@@ -378,7 +383,10 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const response = await fetch(`${API_BASE_URL}/corroborate`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Bypass-Tunnel-Reminder": "true"
+        },
         body: JSON.stringify({
           text: text,
           offline_verdict: offlineVerdict,
