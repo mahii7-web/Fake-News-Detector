@@ -3,10 +3,8 @@
 ## 1. Problem Statement
 This project addresses Problem Statement AI-03: developing an AI system capable of analyzing news articles or text inputs to determine whether the content is reliable or misleading, complete with an explanation and confidence score. While most existing misinformation detection systems are constrained to English, significant volumes of viral misinformation and unverified rumors circulate in regional languages such as Tamil and Hindi across messaging platforms and social networks.
 
-## 2. Proposed Solution
-VaraVaakku is a fully offline, multilingual fake news detection platform supporting Tamil, Hindi, and English using pretrained transformer models. The system operates with zero external API calls or translation services, ensuring deterministic execution and complete reliability during technical evaluation without network dependency. Rather than returning an opaque numerical score, the system includes a dedicated explainability layer that extracts and highlights suspicious phrases, sensational triggers, and abnormal formatting patterns directly from the input text.
 
-## 3. Module Structure
+## 2. Module Structure
 - Input Handler — accepts and sanitizes pasted text inputs across different scripts
 - Language Detection — identifies Tamil, Hindi, and English via `papluca/xlm-roberta-base-language-detection` combined with script range heuristics
 - Classification Engine — produces a zero-shot reliable-vs-misleading verdict using `MoritzLaurer/mDeBERTa-v3-base-mnli-xnli`
@@ -14,7 +12,7 @@ VaraVaakku is a fully offline, multilingual fake news detection platform support
 - Results API — exposes Flask `/classify` and `/samples` endpoints with error-safe JSON responses
 - Frontend Dashboard — displays verdict, confidence percentage, detected language, and highlighted flagged phrases
 
-## 4. Tech Stack
+## 3. Tech Stack
 
 | Layer | Technology |
 |---|---|
@@ -24,7 +22,7 @@ VaraVaakku is a fully offline, multilingual fake news detection platform support
 | Testing | Python unittest via Flask test client |
 | Version Control | Git/GitHub |
 
-## 5. Project Structure
+## 4. Project Structure
 
 ```text
 .
@@ -37,7 +35,7 @@ VaraVaakku is a fully offline, multilingual fake news detection platform support
 └── validate_models.py     # Standalone offline model validation script
 ```
 
-## 6. Setup & Run
+## 5. Setup & Run
 
 1. Clone the repository:
    ```bash
@@ -74,7 +72,7 @@ VaraVaakku is a fully offline, multilingual fake news detection platform support
    http://127.0.0.1:5000
    ```
 
-## 7. Team
+## 6. Team
 - Arunmozhidevan S
 - Mahilesh
 - Kabilan
