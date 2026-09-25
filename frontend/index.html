@@ -82,8 +82,16 @@
               placeholder="Paste news dispatch, viral forward, or claim in English, Hindi (à¤¹à¤¿à¤‚à¤¦à¥€), or Tamil (à®¤à®®à®¿à®´à¯)..."
               spellcheck="false"
             ></textarea>
-            <div class="offline-badge">
-              âš¡ Running 100% offline â€” no API calls
+            <div class="input-meta-bar">
+              <div class="offline-badge">
+                âš¡ Running 100% offline â€” no API calls
+              </div>
+              <div class="backend-connection-bar" id="backendConnectionBar">
+                <span class="backend-dot" id="backendDot" title="Checking health...">â—</span>
+                <span class="backend-label">BACKEND:</span>
+                <span class="backend-url" id="backendUrlDisplay">Checking...</span>
+                <button type="button" class="btn-switch-backend" id="switchBackendBtn" title="Switch backend endpoint">CHANGE âš™</button>
+              </div>
             </div>
           </div>
 

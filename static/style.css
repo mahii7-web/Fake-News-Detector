@@ -260,17 +260,72 @@ body {
   font-size: 16px;
 }
 
+.input-meta-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .offline-badge {
   font-family: var(--font-mono);
   font-size: 11px;
   font-variant: all-small-caps;
   letter-spacing: 1.2px;
   color: var(--ink-muted);
-  margin-top: 8px;
   display: flex;
   align-items: center;
   gap: 6px;
   user-select: none;
+}
+
+.backend-connection-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  background-color: var(--bg-card-paper);
+  border: 1px solid var(--rule-line-subtle);
+  padding: 3px 8px;
+  color: var(--ink-secondary);
+}
+
+.backend-dot {
+  font-size: 11px;
+  color: #B45309;
+  transition: color 0.3s ease;
+}
+
+.backend-label {
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.backend-url {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink-primary);
+  font-weight: 600;
+}
+
+.btn-switch-backend {
+  background: none;
+  border: 1px solid var(--rule-line-subtle);
+  padding: 1px 4px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--ink-muted);
+}
+.btn-switch-backend:hover {
+  background-color: var(--ink-primary);
+  color: var(--bg-newsprint);
 }
 
 /* Desk Action Buttons */

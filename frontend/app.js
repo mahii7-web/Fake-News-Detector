@@ -540,6 +540,64 @@ document.addEventListener("DOMContentLoaded", () => {
     return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   }
 
+  // 10. Backend Endpoint Monitor & Switcher (Render / Tunnel / Localhost)
+  const backendUrlDisplay = document.getElementById("backendUrlDisplay");
+  const backendDot = document.getElementById("backendDot");
+  const switchBackendBtn = document.getElementById("switchBackendBtn");
+
+  function initBackendMonitor() {
+    const activeUrl = API_BASE_URL || (window.location.origin || "http://127.0.0.1:5000");
+    if (backendUrlDisplay) {
+      backendUrlDisplay.textContent = activeUrl.replace(/^https?:\/\//, "");
+      backendUrlDisplay.title = `Active Backend: ${activeUrl}`;
+    }
+
+    if (switchBackendBtn) {
+      switchBackendBtn.addEventListener("click", () => {
+        const current = localStorage.getItem("varavaakku_api_url") || API_BASE_URL || "https://varavaakku-backend.onrender.com";
+        const customUrl = prompt(
+          "SWITCH BACKEND ENDPOINT:\n\n" +
+          "1. Render Cloud: https://varavaakku-backend.onrender.com\n" +
+          "2. Live Fallback Tunnel: https://clear-rockets-punch.loca.lt\n" +
+          "3. Localhost: http://127.0.0.1:5000\n\n" +
+          "Enter backend URL:",
+          current
+        );
+        if (customUrl !== null) {
+          const clean = customUrl.trim().replace(/\/+$/, "");
+          localStorage.setItem("varavaakku_api_url", clean);
+          window.location.reload();
+        }
+      });
+    }
+
+    checkBackendHealth(activeUrl);
+  }
+
+  async function checkBackendHealth(baseUrl) {
+    if (!backendDot) return;
+    try {
+      const pingUrl = `${baseUrl || API_BASE_URL}/health`;
+      const t0 = performance.now();
+      const res = await fetch(pingUrl, {
+        headers: { "bypass-tunnel-reminder": "1" }
+      });
+      const latency = Math.round(performance.now() - t0);
+      if (res.ok) {
+        const info = await res.json();
+        backendDot.style.color = "#2D5A3D"; // green
+        backendDot.title = `Backend Healthy (${latency}ms) · Memory RSS: ${info.process_rss_mb || 'N/A'} MB`;
+      } else {
+        backendDot.style.color = "#B3261E"; // red
+        backendDot.title = `Backend HTTP ${res.status}`;
+      }
+    } catch (e) {
+      backendDot.style.color = "#B45309"; // amber
+      backendDot.title = "Backend cold-starting or offline";
+    }
+  }
+
   // Initial Boot
+  initBackendMonitor();
   loadSamples();
 });
