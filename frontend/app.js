@@ -50,11 +50,12 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentFilter = "all";
   let dispatchCounter = 1042;
 
-  // Backend API URL: uses relative path when hosted on Flask localhost,
-  // and points to live tunnel/Render when deployed as split architecture on Vercel.
+  // Backend API URL: uses relative path when hosted directly on Flask port 5000,
+  // and automatically routes to the live public tunnel when deployed on Vercel or any other host.
+  const isLocalFlask = (window.location.port === "5000");
   const API_BASE_URL = window.API_BASE_URL ||
     localStorage.getItem("varavaakku_api_url") ||
-    ((window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
+    (isLocalFlask
       ? ""
       : "https://clear-rockets-punch.loca.lt");
 
